@@ -1,0 +1,18 @@
+# /bin/bash
+
+WORK_DIR=`dirname $(readlink -f $0)`
+echo ${WORK_DIR}
+
+if [ ! -f "${HOME}/s" ]; then
+	ln -s ${WORK_DIR}/ssh ${HOME}/s
+	exit
+fi
+
+if [ `which dropbear | wc -l` -eq 0 ]; then
+	apt-get update && apt-get install -y \
+		dropbear
+	sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=2022/g' /etc/default/dropbear
+fi
+
+/etc/init.d/dropbear restart
+ps -ef | grep dropbear
