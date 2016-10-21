@@ -1,0 +1,33 @@
+# /bin/bash
+
+WORK_DIR=`dirname $(readlink -f $0)`
+echo ${WORK_DIR}
+
+if [ `which python | wc -l` -eq 0 ]; then
+	apt-get update && apt-get install -y \
+		python \
+		python-openssl
+fi
+
+if [ `which wget | wc -l` -eq 0 ]; then
+	apt-get update && apt-get install -y \
+		wget
+fi
+
+VERSION=3.2.6
+XX_DIR=/opt/xx-net
+if [ ! -d "${XX_DIR}" ]; then
+	if [ ! -f "${WORK_DIR}/${VERSION}.tar.gz" ]; then
+		wget -O ${WORK_DIR}/${VERSION}.tar.gz https://github.com/XX-net/XX-Net/archive/${VERSION}.tar.gz
+	fi
+	tar -zxvf ${WORK_DIR}/${VERSION}.tar.gz -C /opt
+	mv /opt/XX-Net-${VERSION} ${XX_DIR}
+fi
+
+XX_DATA=${XX_DIR}/data
+if [ ! -d "${XX_DATA}" ]; then
+	ln -s ${WORK_DIR}/xx-net/data ${XX_DATA}
+fi
+
+${XX_DIR}/start
+
