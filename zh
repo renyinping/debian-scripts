@@ -1,0 +1,31 @@
+# /bin/bash
+
+WORK_DIR=`dirname $(readlink -f $0)`
+echo ${WORK_DIR}
+
+if [ `which locale-gen | wc -l` -eq 0 ]; then
+	apt-get update && apt-get install -y \
+		locales
+fi
+
+CMD_LOCALE_GEN=0
+
+if [ `locale -a | grep zh_CN.utf8 | wc -l` -eq 0 ]; then
+	echo "Enable zh_CN.UTF-8 UTF-8"
+	sed -i 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen
+	CMD_LOCALE_GEN=1
+fi
+
+if [ `locale -a | grep en_US.utf8 | wc -l` -eq 0 ]; then
+	echo "Enable en_US.UTF-8 UTF-8"
+	sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+	CMD_LOCALE_GEN=1
+fi
+
+if [ ${CMD_LOCALE_GEN} -eq 1 ]; then
+	locale-gen
+fi
+
+export LANG=zh_CN.UTF-8
+export LANGUAGE=en_US.UTF-8
+
